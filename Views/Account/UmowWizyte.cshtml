@@ -1,0 +1,87 @@
+﻿@model Stomatologia.Models.UmowWizyteViewModel
+@{
+    var availableStomatologists = ViewBag.AvailableStomatologists as List<Stomatolog>;
+    var availableDates = ViewBag.AvailableDates as List<DateTime>;
+    var availableHours = ViewBag.AvailableHours as List<string>; 
+    Console.WriteLine($"Liczba stomatologów w ViewBag: {availableStomatologists?.Count}");
+    Console.WriteLine($"Liczba dostępnych dat w ViewBag: {availableDates?.Count}");
+    Console.WriteLine($"Liczba dostępnych godzin w ViewBag: {availableHours?.Count}");
+}
+
+<div class="container">
+<h2>Umów wizytę</h2>
+
+@using (Html.BeginForm("PotwierdzWizyte", "Wizyty", FormMethod.Post))
+{
+    <form method="post">
+        <input type="hidden" name="selectedStomatologId" id="selectedStomatologId" value="" />
+        <label for="selectedStomatolog">Wybierz stomatologa:</label>
+        <select id="selectedStomatolog" name="selectedStomatolog">
+                @foreach (var stomatolog in ViewBag.AvailableStomatologists)
+            {
+                <option value="@stomatolog.Id">@stomatolog.Imie @stomatolog.Nazwisko</option>
+            }
+        </select>
+
+            <label for="selectedDate">Wybierz datę:</label>
+            <select id="selectedDate" name="selectedDate">
+                <!-- Dostępne daty zostaną dynamicznie dodane za pomocą JavaScript -->
+                @foreach (var date in ViewBag.AvailableDates)
+                {
+                    <option value="@date">@date.ToShortDateString()</option>
+                }
+            </select>
+
+            <label for="selectedHour">Wybierz godzinę:</label>
+            <select id="selectedHour" name="selectedHour">
+                <!-- Dostępne godziny zostaną dynamicznie dodane za pomocą JavaScript -->
+                @foreach (var hour in ViewBag.AvailableHours)
+                {
+                    <option value="@hour">@hour</option>
+                }
+            </select>
+
+       
+
+        <input type="submit" value="Umów wizytę" />
+    </form>
+}
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    var availableStomatologists = @Html.Raw(Json.Serialize(ViewBag.AvailableStomatologists));
+    var availableDates = @Html.Raw(Json.Serialize(ViewBag.AvailableDates));
+    var availableHours = @Html.Raw(Json.Serialize(ViewBag.AvailableHours));
+    
+    
+    // Skrypt do obsługi dynamicznego dodawania dostępnych dat i godzin
+    $(document).ready(function () {
+        console.log("Skrypt jest załadowany.");
+        $('#selectedStomatolog').change(function () {
+            var stomatologId = $(this).val();
+            $.ajax({
+                url: '/Account/GetAvailableDatesAndHours',
+                type: 'GET',
+                data: { stomatologId: stomatologId, selectedDate: new Date() },
+                success: function (result) {
+                    // Wypełnij dostępne daty
+                    var dateSelect = $('#selectedDate');
+                    dateSelect.empty();
+                    $.each(result.AvailableDates, function (index, date) {
+                        dateSelect.append($('<option></option>').val(date).html(date));
+                    });
+
+                    // Wypełnij dostępne godziny
+                    var hourSelect = $('#selectedHour');
+                    hourSelect.empty();
+                    $.each(result.AvailableHours, function (index, hour) {
+                        hourSelect.append($('<option></option>').val(hour).html(hour));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Błąd AJAX:", error);
+                }
+            });
+        });
+    });
+</script>
