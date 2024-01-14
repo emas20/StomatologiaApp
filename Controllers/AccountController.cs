@@ -213,7 +213,7 @@ namespace Stomatologia.Controllers
             Console.WriteLine($"Liczba stomatologów w ViewBag: {dostepniStomatolodzy.Count}");
             Console.WriteLine($"Liczba dostępnych dat w ViewBag: {dostepneDaty.Count}");
             Console.WriteLine($"Liczba dostępnych godzin w ViewBag: {availableHours?.Count ?? 0}");
-
+            
             return View();
         }
             

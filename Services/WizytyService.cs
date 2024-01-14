@@ -17,5 +17,15 @@ namespace Stomatologia.Services
             _context.Wizyty.Add(wizyta);
             _context.SaveChanges();
         }
+
+        void IWizytyService.ZapiszWizyte(UmowWizyteViewModel wizyta)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IWizytyService.ZapiszWizyte(object wizyta)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
