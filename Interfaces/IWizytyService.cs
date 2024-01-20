@@ -3,8 +3,6 @@ namespace Stomatologia.Interfaces
 {
     public interface IWizytyService
     {
-    void ZapiszWizyte(UmowWizyteViewModel wizyta);
-        void ZapiszWizyte(object wizyta);
+    void ZapiszWizyte(Wizyta wizyta);
     }
-
 }
