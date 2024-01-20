@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Stomatologia.Models;
+using Stomatologia.Services;
 using System;
 using System.Linq;
 
@@ -14,7 +15,8 @@ namespace Stomatologia.Data
         {
         }
         public DbSet<Stomatolog> Stomatolodzy { get; set; }
-        public DbSet<UmowWizyteViewModel> Wizyty { get; set; }
+        //public DbSet<UmowWizyteViewModel> Wizyty { get; set; }
+        public DbSet<Wizyta> Wizyty { get; set; }
 
         public DbSet<Stomatologia.Models.User>? User { get; set; }
 
@@ -38,11 +40,11 @@ namespace Stomatologia.Data
                 {
                     var stomatolodzy = new Stomatolog[]
                     {
-                new Stomatolog {Id = "3", Imie = "Krzysztof", Nazwisko = "Nowak", Specjalizacja = "Stomatolog", UserName = "KNowak@clinic.pl" },
-                new Stomatolog {Id = "4", Imie = "Monika", Nazwisko = "Kowalska", Specjalizacja = "Stomatolog Dziecięcy", UserName = "MKowalska@clinic.pl" },
-                new Stomatolog {Id = "5", Imie = "Katarzyna", Nazwisko = "Grabowska", Specjalizacja = "Periodontolog", UserName = "KGrabowska@clinic.pl" },
-                new Stomatolog {Id = "6", Imie = "Piotr", Nazwisko = "Wawrzyniak", Specjalizacja = "Protetyk", UserName = "PWawrzyniak@clinic.pl" },
-                new Stomatolog {Id = "7", Imie = "Adam", Nazwisko = "Leon", Specjalizacja = "Ortodonta", UserName = "ALeon@clinic.pl" }
+                new Stomatolog {Id = "3", Imie = "Krzysztof", Nazwisko = "Nowak", Specjalizacja = "Stomatolog", UserName = "KNowak@clinic.pl", Email ="KNowak@clinic.pl" },
+                new Stomatolog {Id = "4", Imie = "Monika", Nazwisko = "Kowalska", Specjalizacja = "Stomatolog Dziecięcy", UserName = "MKowalska@clinic.pl", Email = "MKowalska@clinic.pl" },
+                new Stomatolog {Id = "5", Imie = "Katarzyna", Nazwisko = "Grabowska", Specjalizacja = "Periodontolog", UserName = "KGrabowska@clinic.pl", Email="KGrabowska@clinic.pl" },
+                new Stomatolog {Id = "6", Imie = "Piotr", Nazwisko = "Wawrzyniak", Specjalizacja = "Protetyk", UserName = "PWawrzyniak@clinic.pl", Email="PWawrzyniak@clinic.pl" },
+                new Stomatolog {Id = "7", Imie = "Adam", Nazwisko = "Leon", Specjalizacja = "Ortodonta", UserName = "ALeon@clinic.pl", Email = "ALeon@clinic.pl"  }
                     };
 
                     foreach (var stomatolog in stomatolodzy)
@@ -68,21 +70,26 @@ namespace Stomatologia.Data
                         var random = new Random();
                         var stomatologIds = context.Stomatolodzy.Select(s => s.Id).ToList();
 
-                        var wizyty = new UmowWizyteViewModel[]
-                        {
-                new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(7), WybranaGodzina = "09:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
-                new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(14), WybranaGodzina = "10:30", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
-                new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(15), WybranaGodzina = "11:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
-                new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(3), WybranaGodzina = "09:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
-                new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(8), WybranaGodzina = "10:30", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
-                new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(10), WybranaGodzina = "11:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
-                new UmowWizyteViewModel { WybranyStomatologId = "3", WybranaData = DateTime.Now.AddDays(7), WybranaGodzina = "09:00" },
-                new UmowWizyteViewModel { WybranyStomatologId = "4", WybranaData = DateTime.Now.AddDays(14), WybranaGodzina = "10:00" },
-                new UmowWizyteViewModel { WybranyStomatologId = "5", WybranaData = DateTime.Now.AddDays(15), WybranaGodzina = "10:30" },
-                new UmowWizyteViewModel { WybranyStomatologId = "6", WybranaData = DateTime.Now.AddDays(3), WybranaGodzina = "11:00" },
-                new UmowWizyteViewModel { WybranyStomatologId = "7", WybranaData = DateTime.Now.AddDays(8), WybranaGodzina = "09:00" }
-                        };
+                        var wizyty = new List<Wizyta>
+            {
+                new Wizyta { WybranaData = DateTime.Now.AddDays(7), WybranaGodzina = "09:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                // Dodaj inne przykładowe wizyty
+            };
 
+                        //var wizyty = new UmowWizyteViewModel[]
+                        // {
+                        // new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(7), WybranaGodzina = "09:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                        //new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(14), WybranaGodzina = "10:30", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                        // new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(15), WybranaGodzina = "11:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                        // new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(3), WybranaGodzina = "09:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                        // new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(8), WybranaGodzina = "10:30", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                        // new UmowWizyteViewModel { WybranaData = DateTime.Now.AddDays(10), WybranaGodzina = "11:00", WybranyStomatologId = stomatologIds[random.Next(stomatologIds.Count)] },
+                        // new UmowWizyteViewModel { WybranyStomatologId = "3", WybranaData = DateTime.Now.AddDays(7), WybranaGodzina = "09:00" },
+                        // new UmowWizyteViewModel { WybranyStomatologId = "4", WybranaData = DateTime.Now.AddDays(14), WybranaGodzina = "10:00" },
+                        // new UmowWizyteViewModel { WybranyStomatologId = "5", WybranaData = DateTime.Now.AddDays(15), WybranaGodzina = "10:30" },
+                        // new UmowWizyteViewModel { WybranyStomatologId = "6", WybranaData = DateTime.Now.AddDays(3), WybranaGodzina = "11:00" },
+                        // new UmowWizyteViewModel { WybranyStomatologId = "7", WybranaData = DateTime.Now.AddDays(8), WybranaGodzina = "09:00" }
+                        //        };
 
                         context.Wizyty.AddRange(wizyty);
                         context.SaveChanges();
@@ -92,6 +99,3 @@ namespace Stomatologia.Data
         }
     }
 }
-        
-    
-    
