@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +13,7 @@ using Stomatologia.Services;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
+using Stomatologia.Data;
 
 namespace Stomatologia.Controllers
 {
@@ -24,7 +25,8 @@ namespace Stomatologia.Controllers
         private readonly ILogger<IdentityUser> _logger;
         private readonly IWizytyService _wizytyService;
         private readonly StomatologService _stomatologService;
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<IdentityUser> logger, IWizytyService wizytyService, StomatologService stomatologService)
+        private readonly ApplicationDbContext _context;
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<IdentityUser> logger, IWizytyService wizytyService, StomatologService stomatologService, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -32,6 +34,7 @@ namespace Stomatologia.Controllers
             _logger = logger;
             _wizytyService = wizytyService;
             _stomatologService = stomatologService;
+            _context = context;
         }
 
         [HttpGet]
@@ -196,9 +199,12 @@ namespace Stomatologia.Controllers
 
             // Pobierz pierwszą datę jako domyślną
             var defaultDate = dostepneDaty.FirstOrDefault();
-
-            var dostepniStomatolodzy = _stomatologService.GetAvailableStomatologists();
+            
+            var dostepniStomatolodzy = _context.Stomatolodzy.ToList();
             ViewBag.AvailableStomatologists = dostepniStomatolodzy;
+
+            //var dostepniStomatolodzy = _stomatologService.GetAvailableStomatologists();
+            //ViewBag.AvailableStomatologists = dostepniStomatolodzy;
 
             //var availableStomatologists = _stomatologService.GetAvailableStomatologists();
            // ViewBag.AvailableStomatologists = availableStomatologists;
@@ -213,31 +219,34 @@ namespace Stomatologia.Controllers
             Console.WriteLine($"Liczba stomatologów w ViewBag: {dostepniStomatolodzy.Count}");
             Console.WriteLine($"Liczba dostępnych dat w ViewBag: {dostepneDaty.Count}");
             Console.WriteLine($"Liczba dostępnych godzin w ViewBag: {availableHours?.Count ?? 0}");
-            
+            //return RedirectToAction("Account", "PotwierdzWizyte");
             return View();
         }
-            
-            
+
+        [HttpPost]
         [Authorize]
        
         public IActionResult PotwierdzWizyte(UmowWizyteViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Tutaj można wykorzystać serwis do zapisania informacji o wizycie
-                // np. zapis do bazy danych
+               
 
-                var wizyta = new UmowWizyteViewModel
+                var wizyta = new Wizyta
                 {
                     WybranyStomatologId = model.WybranyStomatologId,
                     WybranaData = model.WybranaData,
                     WybranaGodzina = model.WybranaGodzina
                 };
+                //_context.Wizyty.Add(wizyta);
+                
                 _wizytyService.ZapiszWizyte(wizyta);
+               
+                _context.SaveChanges();
                 TempData["SuccessMessage"] = "Wizyta została pomyślnie zapisana.";
-                HttpContext.Session.Remove("WybranaData");
-                HttpContext.Session.Remove("WybranaGodzina");
-                return RedirectToAction("Index", "Home");
+                //HttpContext.Session.Remove("WybranaData");
+                //HttpContext.Session.Remove("WybranaGodzina");
+                //return RedirectToAction("Index", "Home");
             }
             return View(model);
     }
