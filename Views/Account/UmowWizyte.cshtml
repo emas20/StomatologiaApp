@@ -1,78 +1,21 @@
-﻿@model Stomatologia.Models.UmowWizyteViewModel
-@{
-    var availableStomatologists = ViewBag.AvailableStomatologists as List<Stomatolog>;
-    var availableDates = ViewBag.AvailableDates as List<DateTime>;
-    var availableHours = ViewBag.AvailableHours as List<string>; 
+@model Stomatologia.Models.UmowWizyteViewModel
 
-    Console.WriteLine($"Liczba stomatologów w ViewBag: {availableStomatologists?.Count}");
-    Console.WriteLine($"Liczba dostępnych dat w ViewBag: {availableDates?.Count}");
-    Console.WriteLine($"Liczba dostępnych godzin w ViewBag: {availableHours?.Count}");
-}
-
-<div class="container">
-<h2>Umów wizytę</h2>
-
-<div class="container">
-    <h2>Potwierdzenie wizyty</h2>
-    <form class="form-horizontal" asp-action="PotwierdzWizyte" method="post">
-        <div class="form-group">
-        <input type="hidden" name="selectedStomatologId" id="selectedStomatologId" value="" />
-        <label for="selectedStomatolog">Wybierz stomatologa:</label>
-        <select id="selectedStomatolog" name="selectedStomatolog">
+<form asp-action="PotwierdzWizyte" method="post">
+    <div class="form-group">
+            <label for="WybranyStomatologId">Wybierz stomatologa:</label>
+            <select asp-for="WybranyStomatologId" class="form-control">
                 @foreach (var stomatolog in ViewBag.AvailableStomatologists)
-            {
-                <option value="@stomatolog.Id">@stomatolog.Imie @stomatolog.Nazwisko</option>
-            }
-        </select>
-
-                <div class="form-group">
-                    <label for="WybranaData">Wybrana Data:</label>
-                    <input type="date" class="form-control" asp-for="WybranaData" />
-                </div>
-                <div class="form-group">
-                    <label for="WybranaGodzina">Wybrana Godzina:</label>
-                    <input type="time" class="form-control" asp-for="WybranaGodzina" />
-                </div>
-
-        <input type="submit" value="Umów wizytę" />
-    </form>
-
-</div>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script>
-    var availableStomatologists = @Html.Raw(Json.Serialize(ViewBag.AvailableStomatologists));
-    var availableDates = @Html.Raw(Json.Serialize(ViewBag.AvailableDates));
-    var availableHours = @Html.Raw(Json.Serialize(ViewBag.AvailableHours));
-    
-    
-    // Skrypt do obsługi dynamicznego dodawania dostępnych dat i godzin
-    $(document).ready(function () {
-        console.log("Skrypt jest załadowany.");
-        $('#selectedStomatolog').change(function () {
-            var stomatologId = $(this).val();
-            $.ajax({
-                url: '/Account/GetAvailableDatesAndHours',
-                type: 'GET',
-                data: { stomatologId: stomatologId, selectedDate: new Date() },
-                success: function (result) {
-                    // Wypełnij dostępne daty
-                    var dateSelect = $('#selectedDate');
-                    dateSelect.empty();
-                    $.each(result.AvailableDates, function (index, date) {
-                        dateSelect.append($('<option></option>').val(date).html(date));
-                    });
-
-                    // Wypełnij dostępne godziny
-                    var hourSelect = $('#selectedHour');
-                    hourSelect.empty();
-                    $.each(result.AvailableHours, function (index, hour) {
-                        hourSelect.append($('<option></option>').val(hour).html(hour));
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error("Błąd AJAX:", error);
+                {
+                    <option value="@stomatolog.Id">@stomatolog.Imie @stomatolog.Nazwisko</option>
                 }
-            });
-        });
-    });
-</script>
+            </select>
+        </div>
+        <label for="WybranaData">Wybierz datę wizyty:</label>
+        <input type="date" class="form-control" asp-for="WybranaData" />
+    
+    <div class="form-group">
+        <label for="WybranaGodzina">Wybierz godzinę wizyty:</label>
+        <input type="time" class="form-control" asp-for="WybranaGodzina" />
+    </div>
+    <input type="submit" value="Umów wizytę" />
+</form>
