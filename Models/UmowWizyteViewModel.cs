@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Stomatologia.Models
 {
@@ -15,6 +16,7 @@ namespace Stomatologia.Models
         public string? WybranaGodzina { get; set; }
         
         [Required(ErrorMessage = "Wybierz stomatologa.")]
+        [Column("WybranyStomatologId")]
         public string? WybranyStomatologId { get; set; }
 
         //public IEnumerable<string>? DostepneGodziny { get; set; }
